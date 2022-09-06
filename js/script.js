@@ -11,12 +11,12 @@ var timerRef = null;	// Referens till timern för bilens förflyttning
 var startBtn;			// Referens till startknappen
 var stopBtn;			// Referens till stoppknappen
 /* === Tillägg i uppgiften === */
-let pigElem;			// Referens till img-element för grisen
-let boarNrElem;			// Referens till vildsvin 
-let boarHitElem;		// Referens till antal träffar
-let boarNr;				// Antal vildsvin
-let boarHit;			// Antal vildsvin använderen träffat
-let timerBoar = null;	// Timer till nästa gris
+let pigElem;				// Referens till img-element för grisen
+let boarNrElem;				// Referens till vildsvin 
+let boarHitElem;			// Referens till antal träffar
+let boarNr;					// Antal vildsvin
+let boarHit;				// Antal vildsvin använderen träffat
+let timerBoar = null;		// Timer till nästa gris
 let timerCollision = null;	// Timer för att kolla kollision
 
 
@@ -75,8 +75,10 @@ function startGame() {
 	/* === Tillägg i uppgiften === */
 	boarNr = 0;
 	boarHit = 0;
+	boarNrElem.innerText = boarNr;
+	boarHitElem.innerText = boarHit;
 	setTimeout(spawnBoar, 2000);
-	collision();
+	checkCollision();
 	
 
 } // End startGame
@@ -88,6 +90,7 @@ function stopGame() {
 	stopBtn.disabled = true;
 	/* === Tillägg i uppgiften === */
 	if(timerBoar != null) clearTimeout(timerBoar);
+	if(timerCollision != null) clearTimeout(timerCollision);
 	
 
 } // End stopGame
@@ -126,10 +129,11 @@ function moveCar() {
 // ------------------------------
 
 /* === Tillägg av nya funktioner i uppgiften === */
+// Spawnar grisar var 2000ms
 function spawnBoar() {
 	let xLimit = boardElem.offsetWidth - pigElem.offsetWidth;
 	let yLimit = boardElem.offsetHeight - pigElem.offsetHeight;
-	let x = parseInt(Math.random() * xLimit);	// x-koordinat (left) för grisen
+	let x = parseInt(Math.random() * xLimit);		// x-koordinat (left) för grisen
 	let y = parseInt(Math.random() * yLimit);		// y-koordinat (top) för grisen
 
 	pigElem.style.left = x + "px";
@@ -137,35 +141,50 @@ function spawnBoar() {
 
 	boarNr++;
 	boarNrElem.innerText = boarNr;
-	pigElem.style.visibility = "visible";
-
+	
 	if(boarNr == 10) {
-		stopGame();
+		setTimeout(function() {
+			pigElem.style.visibility = "hidden";
+			stopGame();
+		}, 2000)
 	} else {
-		//timerBoar = setTimeout(spawnBoar, 2000);
+		loadImage(0);
+		pigElem.style.visibility = "visible";
+		timerBoar = setTimeout(spawnBoar, 2000);
 	}
 	
 }
 
-function collision() {
-	let carLeft = carElem.style.left;			// Bilens vänsterkant
-	let carTop = carElem.style.top;					// Bilens toppkant
-	let carSize = carElem.offsetWidth;			// Bilens storlek
-	let pigLeft = pigElem.style.left;					// Grisens vänsterkant
-	let pigTop = pigElem.style.top;					// Grisens toppkant
-	let pigSize = pigElem.offsetWidth;			// Grisens storlek
+// Kollar kollisionen mellan bilen och grisen
+function checkCollision() {
+	let carLeft = parseInt(carElem.style.left);			// Bilens vänsterkant
+	let carTop = parseInt(carElem.style.top);			// Bilens toppkant
+	let carSize = parseInt(carElem.offsetWidth);		// Bilens storlek
+	let pigLeft = parseInt(pigElem.style.left);			// Grisens vänsterkant
+	let pigTop = parseInt(pigElem.style.top);			// Grisens toppkant
+	let pigSize = parseInt(pigElem.offsetWidth);		// Grisens storlek
 
-	if(carLeft < pigLeft && carTop > pigTop) {
-		console.log("träff");
+
+	if(carTop < pigTop + pigSize &&				// Bilens top mindre än grisens botten
+		carTop + carSize > pigTop &&			// Bilens botten större än grisens top
+		carLeft < pigLeft + pigSize &&			// Bilens vänsterkant mindre än grisens högerkant
+		carLeft + carSize > pigLeft) {			// Bilens högerkant större än grisens vänsterkant
+
+		
+		if(pigElem.getAttribute("src") === "img/pig.png") {
+			boarHit++;
+			boarHitElem.innerText = boarHit;
+			loadImage(1);
+		}
 	}
 
-	if(carLeft < pigLeft && carSize-carTop > pigSize-pigTop) {
-		console.log("träff");
-	}
-	
+	timerCollision = setTimeout(checkCollision, 500);
+}
 
-	timerCollision = setTimeout(collision, 200);
 
-	
+function loadImage(index) {
+	let imgNames = ["pig.png", "smack.png"]
+	pigElem.src = `img/${imgNames[index]}`;
+
 }
 
