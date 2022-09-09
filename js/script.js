@@ -13,9 +13,9 @@ var stopBtn;			// Referens till stoppknappen
 /* === Tillägg i uppgiften === */
 let pigElem;				// Referens till img-element för grisen
 let pigNrElem;				// Referens till vildsvin 
-let pigHitElem;			// Referens till antal träffar
+let pigHitElem;				// Referens till antal träffar
 let pigNr;					// Antal vildsvin
-let pigHit;				// Antal vildsvin använderen träffat
+let pigHit;					// Antal vildsvin använderen träffat
 let timerPig = null;		// Timer till nästa gris
 let timerCollision = null;	// Timer för att kolla kollision
 
@@ -129,7 +129,9 @@ function moveCar() {
 // ------------------------------
 
 /* === Tillägg av nya funktioner i uppgiften === */
-// Spawnar grisar var 2000ms
+/**
+ * Skapar en gris var 2000ms
+ */
 function spawnPig() {
 	let xLimit = boardElem.offsetWidth - pigElem.offsetWidth;
 	let yLimit = boardElem.offsetHeight - pigElem.offsetHeight;
@@ -154,7 +156,9 @@ function spawnPig() {
 	}
 }
 
-// Kollar kollisionen mellan bilen och grisen
+/**
+ * Om bilen och grisen kolliderar visas en smäll
+ */
 function checkCollision() {
 	let carLeft = parseInt(carElem.style.left);			// Bilens vänsterkant
 	let carTop = parseInt(carElem.style.top);			// Bilens toppkant
@@ -177,5 +181,5 @@ function checkCollision() {
 		}
 	}
 
-	timerCollision = setTimeout(checkCollision, 500);
+	timerCollision = setTimeout(checkCollision, 250);
 }
